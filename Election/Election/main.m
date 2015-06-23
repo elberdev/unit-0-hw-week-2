@@ -12,7 +12,8 @@
 @class Contender;
 @class Election;
 
-// Contender class
+//*************************** Contender class **********************************
+
 @interface Contender : NSObject
 
 - (instancetype)initWithName:(NSString *)name;
@@ -50,11 +51,15 @@
 }
 
 - (NSString *)description {
-    return [NSString stringWithFormat:@"%@ received %ld votes", _name, _votesReceived];
+    return [NSString stringWithFormat:@"%@ received %ld votes", _name,
+            _votesReceived];
 }
 
 @end
+//************************** End Contender class *******************************
 
+
+//*************************** Election class ***********************************
 
 @interface Election : NSObject
 
@@ -71,10 +76,10 @@
 
 @end
 
-
-// Election class
 @implementation Election {
     NSString *_electionName;
+    
+    // Cool! a mutable array!
     NSMutableArray *_listOfContenders;
 }
 
@@ -90,6 +95,8 @@
    if (_listOfContenders == nil) {
        _listOfContenders = [[NSMutableArray alloc] init];
    }
+    
+    // addObject: an NSMutableArray method
     [_listOfContenders addObject:contender];
 }
 
@@ -150,9 +157,11 @@
 }
 
 @end
+//************************** End Election class ********************************
 
 
-// ElectionManager class
+//************************* ElectionManager class ******************************
+
 @interface ElectionManager : NSObject
 
 - (void)manage:(Election *)race;
@@ -200,7 +209,7 @@
 
 
 @end
-
+//*********************** End ElectionManager class ****************************
 
 
 int main(int argc, const char * argv[]) {
