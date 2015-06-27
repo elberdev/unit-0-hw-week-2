@@ -192,14 +192,14 @@
 }
 
 - (void)displayResults {
-    printf("Results of voting...\n");
+    printf("\nResults of voting...\n");
     for (Election *race in _races) {
         [race displayResults];
     }
 }
 
 - (BOOL)pollsOpen {
-    printf("Type 0 to close polls otherwise enter 1 to continue: ");
+    printf("\nType 0 to close polls otherwise enter 1 to continue: ");
     int answer;
     scanf("%d", &answer);
     fpurge(stdin);
@@ -237,6 +237,11 @@ int main(int argc, const char * argv[]) {
         NSLog(@"\n");
         NSLog(@"Candidates for %@:", [asshole electionName]);
         [asshole displayCandidates];
+        
+        ElectionManager *em = [[ElectionManager alloc] init];
+        [em manage:president];
+        [em initiatePolling];
+        [em displayResults];
         
         
         
