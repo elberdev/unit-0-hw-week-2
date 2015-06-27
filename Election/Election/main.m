@@ -69,7 +69,7 @@
 - (NSString *)electionName;
 
 - (void)addContender:(Contender *)contender;
-- (void)vote;
+- (void)voteIsSimulated:(BOOL)simulated;
 - (void)vote:(NSInteger)index;
 - (void)displayCandidates;
 - (void)displayResults;
@@ -127,7 +127,7 @@
     }
 }
 
-- (void)vote {
+- (void)voteIsSimulated:(BOOL)simulated {
     NSInteger i = 1;
     
     for (Contender *c in _listOfContenders) {
@@ -142,7 +142,12 @@
     while (!voted) {
         printf("\nEnter the index of the Contender you want to vote for: ");
         int vote;
-        scanf("%d", &vote);
+        
+        if(simulated == YES) {
+            vote = arc4random_uniform((int)[_listOfContenders count]) + 1;
+        } else {
+            scanf("%d", &vote);
+        }
         
         int index = vote - 1;
         
@@ -166,6 +171,7 @@
 
 - (void)manage:(Election *)race;
 - (void)initiatePolling;
+- (void)initiateSimulatedPolling:(NSInteger)voterTurnout;
 - (void)displayResults;
 - (BOOL)pollsOpen;
 
@@ -186,7 +192,17 @@
     while ([self pollsOpen]) {
         for (Election *race in _races) {
             printf("\nVOTE FOR ONE! \n");
-            [race vote];
+            [race voteIsSimulated:NO];
+        }
+    }
+}
+
+- (void)initiateSimulatedPolling:(NSInteger)voterTurnout {
+    for (NSInteger count = 0; count < voterTurnout; count++) {
+        for (Election *race in _races) {
+            //usleep(2e5);
+            printf("\nVOTE FOR ONE! \n");
+            [race voteIsSimulated:YES];
         }
     }
 }
@@ -210,6 +226,52 @@
 
 @end
 //*********************** End ElectionManager class ****************************
+
+
+//************************ ElectionSimulator class *****************************
+
+@interface ElectionSimulator : NSObject
+
+- (void)setElectionManager:(ElectionManager *)em;
+
+@end
+
+@implementation ElectionSimulator {
+    ElectionManager *_em;
+    NSInteger _vt;
+}
+
+- (id)initWithElectionManager:(ElectionManager *)em {
+    if (self = [super init]) {
+        _em = em;
+    }
+    return self;
+}
+
+- (void)setElectionManager:(ElectionManager *)em {
+    _em = em;
+}
+
+- (void)run {
+    if (_em != nil) {
+        
+        printf("\nPlease input the number of voters who turned out for the election: ");
+        int voterTurnout;
+        scanf("%d", &voterTurnout);
+        fpurge(stdin);
+        [_em initiateSimulatedPolling:voterTurnout];
+        [_em displayResults];
+        
+    } else {
+        
+        NSLog(@"\n");
+        NSLog(@"Please run setElectionManager method with a valid ElectionManager.");
+        
+    }
+}
+
+@end
+//********************** End ElectionSimulator class ***************************
 
 
 int main(int argc, const char * argv[]) {
@@ -240,9 +302,12 @@ int main(int argc, const char * argv[]) {
         
         ElectionManager *em = [[ElectionManager alloc] init];
         [em manage:president];
+        [em manage:asshole];
         [em initiatePolling];
         [em displayResults];
         
+        ElectionSimulator *es = [[ElectionSimulator alloc] initWithElectionManager:em];
+        [es run];
         
         
     }
