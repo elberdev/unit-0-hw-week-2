@@ -215,6 +215,13 @@
 int main(int argc, const char * argv[]) {
     @autoreleasepool {
         
+        Contender *bernie = [[Contender alloc] initWithName:@"Bernie Sanders"];
+        Contender *hillary = [[Contender alloc] initWithName:@"Hillary Clinton"];
+        Contender *ann = [[Contender alloc] initWithName:@"Ann Coulter"];
+        Contender *donald = [[Contender alloc] initWithName:@"Donald Trump"];
+        Contender *jeb = [[Contender alloc] initWithName:@"Jeb Bush"];
+        Contender *chris = [[Contender alloc] initWithName:@"Chris Christie"];
+        
     }
     return 0;
 }

@@ -103,7 +103,6 @@
     NSInteger zeroIndexDistance = 0;
     NSInteger otherIndexDistance = 0;
     
-    // THIS IS NOT QUITE WORKING CORRECTLY YET.
     for (NSInteger i = 0; i < count; i++) {
         if (isalnum(buffer1[i]) && isalnum(buffer2[i])) {
             if (i == 0) {

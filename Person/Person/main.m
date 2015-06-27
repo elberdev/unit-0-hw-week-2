@@ -22,7 +22,10 @@
 - (BOOL)checkSameCity:(Person *)person;
 - (BOOL)checkSamePhoneNumber:(Person *)person;
 
-- (Person *)registerChild;
+- (Person *)registerChild:(NSString *)name;
+- (void)changePersonName:(Person *)aPerson
+                  toName:(NSString *)newName;
+- (void)claimChild:(Person *)childToClaim;
 
 @end
 
@@ -30,6 +33,7 @@
     NSString *_name;
     NSString *_phoneNumber;
     NSString *_city;
+    NSMutableArray *_children;
 }
 
 - (void)setName:(NSString *)name {
@@ -57,7 +61,7 @@
 }
 
 - (BOOL)checkSameCity:(Person *)person {
-    if ([self city] == [person city]) {
+    if ([[self city] isEqualToString:[person city]]) {
         return YES;
     } else {
         return NO;
@@ -65,20 +69,32 @@
 }
 
 - (BOOL)checkSamePhoneNumber:(Person *)person {
-    if ([self phoneNumber] == [person phoneNumber]) {
+    if ([[self phoneNumber] isEqualToString:[person phoneNumber]]) {
         return YES;
     } else {
         return NO;
     }
 }
 
-- (Person *)registerChild {
+- (Person *)registerChild:(NSString *)name {
     Person *abc = [[Person alloc] init];
-    [abc setName:@"Abc"];
+    [abc setName:name];
     [abc setCity:[self city]];
     [abc setPhoneNumber:[self phoneNumber]];
     
     return abc;
+}
+
+- (void)changePersonName:(Person *)aPerson
+                  toName:(NSString *)newName {
+    [aPerson setName:newName];
+}
+
+- (void)claimChild:(Person *)childToClaim {
+    if (_children == nil) {
+        _children = [[NSMutableArray alloc] init];
+    }
+    [_children addObject:childToClaim];
 }
 
 @end
@@ -108,13 +124,16 @@ int main(int argc, const char * argv[]) {
         NSLog(@"Does %@ live in the same city as %@? %@.", [clara name],
               [kim name], [clara checkSameCity:kim] ? @"Yes" : @"No");
         
-        Person *abc = [clara registerChild];
+        Person *carl = [clara registerChild:@"Carl"];
         
         NSLog(@"Does %@ live in the same city as %@? %@.", [clara name],
-              [abc name], [clara checkSameCity:abc] ? @"Yes" : @"No");
+              [carl name], [clara checkSameCity:carl] ? @"Yes" : @"No");
 
         NSLog(@"Does %@ have the same phone number as %@? %@.", [clara name],
-              [abc name], [clara checkSamePhoneNumber:abc] ? @"Yes" : @"No");
+              [carl name], [clara checkSamePhoneNumber:carl] ? @"Yes" : @"No");
+        
+        [kim changePersonName:carl toName:@"Biff"];
+        [kim claimChild:carl];
         
     }
     return 0;
