@@ -44,3 +44,4 @@ Write a program to simulate an election. Create a class called **VotingSimulator
 6. Ask the ElectionManager to ***displayResults***
 
 ***stuff***
+branches
