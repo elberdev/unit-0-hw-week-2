@@ -115,7 +115,7 @@
 
 - (void)displayCandidates {
     for (Contender *c in _listOfContenders) {
-        NSLog(@"%@", [c name]);
+        printf("%s\n", [[c name] UTF8String]);
     }
 }
 
@@ -255,6 +255,8 @@
 - (void)run {
     if (_em != nil) {
         
+        printf("\n\n      ***** BEGINNING SIMULATED ELECTIONS *****\n");
+        
         printf("\nPlease input the number of voters who turned out for the election: ");
         int voterTurnout;
         scanf("%d", &voterTurnout);
@@ -264,8 +266,7 @@
         
     } else {
         
-        NSLog(@"\n");
-        NSLog(@"Please run setElectionManager method with a valid ElectionManager.");
+        printf("\nPlease run setElectionManager method with a valid ElectionManager.");
         
     }
 }
@@ -289,15 +290,13 @@ int main(int argc, const char * argv[]) {
         [president addContender:hillary];
         [president addContender:jeb];
         [president addContender:chris];
-        NSLog(@"\n");
-        NSLog(@"Candidates for %@:", [president electionName]);
+        printf("\nCandidates for %s: \n", [[president electionName] UTF8String]);
         [president displayCandidates];
         
         Election *asshole = [[Election alloc] initWithElectionName:@"Asshole"];
         [asshole addContender:ann];
         [asshole addContender:donald];
-        NSLog(@"\n");
-        NSLog(@"Candidates for %@:", [asshole electionName]);
+        printf("\nCandidates for %s: \n", [[asshole electionName] UTF8String]);
         [asshole displayCandidates];
         
         ElectionManager *em = [[ElectionManager alloc] init];
