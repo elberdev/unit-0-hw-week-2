@@ -12,18 +12,29 @@
 
 - (NSString *)decode:(NSString *)string offset:(NSInteger)offset;
 - (NSString *)encode:(NSString *)string offset:(NSInteger)offset;
-- (BOOL)isSameMessage:(NSString *)msg1 asMessage:(NSString *)msg2;
+
+- (BOOL)easyIsSameMessage:(NSString *)msg1 asMessage:(NSString *)msg2;
+- (BOOL)hardIsSameMessage:(NSString *)msg1 asMessage:(NSString *)msg2;
 
 @end
 
-@implementation CaesarCipher
+@implementation CaesarCipher {
+    NSInteger _alphabetSize;
+}
+
+-(id)init {
+    if (self = [super init]) {
+        _alphabetSize = 26;
+    }
+    return self;
+}
 
 - (NSString *)encode:(NSString *)string offset:(NSInteger)offset {
     
     // if offset is an illegal value, the assert statement will
     // fail and the app will crash with the provided error message
-    if (offset > 25) {
-        NSAssert(offset < 26, @"offset is out of range. 1 - 25");
+    if (offset > _alphabetSize - 1) {
+        NSAssert(offset < _alphabetSize, @"offset is out of range. 1 - 25");
     }
     
     // unsigned can be positive only (like size_t)
@@ -62,7 +73,7 @@
         // modulo 26 ensures the values are only between 1 and 26
         // and adding low back gives us the correct unicode decimal of the new
         // char
-        result[i] = (buffer[i]%low + offset)%26 + low;
+        result[i] = (buffer[i]%low + offset)%_alphabetSize + low;
         
 //        // DEBUG
 //        NSLog(@"buffer[%ld]:%u %% low:%ld + offset:%ld = %ld", i, buffer[i], low,
@@ -82,51 +93,81 @@
     // EXAMPLE: offset 8 to encode becomes offset 18 to decode
     // both encoder and decoder only need to knwow what the original offset
     // was. The decode method will do the rest
-    return [self encode:string offset: (26 - offset)];
+    return [self encode:string offset: (_alphabetSize - offset)];
 }
 
-- (BOOL)isSameMessage:(NSString *)msg1 asMessage:(NSString *)msg2 {
+// THIS VERSION USES THE EXISTING ENCODING AND DECODING ALGORITHMS
+- (BOOL)easyIsSameMessage:(NSString *)msg1 asMessage:(NSString *)msg2 {
+    if ([msg1 length] != [msg2 length]) {
+        return NO;
+    } else {
+        for(int i = 1; i < _alphabetSize; i++) {
+            if ([msg1 isEqualToString: [self encode:msg2 offset:i]]) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+// THIS VERSION DOES NOT USE THE EXISTING ENCODE OR DECODE METHODS.
+// IT USES THE LOGIC OF THE CAESAR CIPHER TO TELL THE USER IF THE MESSAGES
+// ARE THE SAME WITHOUT DECODING THEM
+- (BOOL)hardIsSameMessage:(NSString *)msg1 asMessage:(NSString *)msg2 {
     
     unsigned long count = [msg1 length];
     
+    // if messages are different lengths don't bother running algorithm
     if (count != [msg2 length]) {
         NSLog(@"Number of letters is different.");
         return NO;
     }
     
+    // create unichar buffer for each message
     unichar buffer1[count];
     unichar buffer2[count];
-    
     [msg1 getCharacters:buffer1 range:NSMakeRange(0, count)];
     [msg2 getCharacters:buffer2 range:NSMakeRange(0, count)];
     
+    // initialize value for distance between letters at index 0
     NSInteger zeroIndexDistance = 0;
+    
+    // initialize value for distance between letters at subsequent indexes
     NSInteger otherIndexDistance = 0;
     
+    
     for (NSInteger i = 0; i < count; i++) {
+        
+        // checks that the word sizes and spacing in the senctence is the same
         if (isalnum(buffer1[i]) && isalnum(buffer2[i])) {
+            
+            // get real distance of letters at index 0
             if (i == 0) {
                 zeroIndexDistance = buffer1[i] - buffer2[i];
+                
+                // adjust for negative value
                 if (zeroIndexDistance < 0) {
-                    zeroIndexDistance += 26;
+                    zeroIndexDistance += _alphabetSize;
                 }
-//                // DEBUG
-//                NSLog(@"buffer1[%ld] is %u", i, buffer1[i]);
-//                NSLog(@"buffer2[%ld] is %u", i, buffer2[i]);
-//                NSLog(@"zeroIndexDistance is: %ld", zeroIndexDistance);
+            
+            // get real distance between letters after index 0
             } else {
                 otherIndexDistance = buffer1[i] - buffer2[i];
+                
+                // adjust for negative value
                 if (otherIndexDistance < 0) {
-                    otherIndexDistance += 26;
+                    otherIndexDistance += _alphabetSize;
                 }
-//                // DEBUG
-//                NSLog(@"buffer1[%ld] is %u", i, buffer1[i]);
-//                NSLog(@"buffer2[%ld] is %u", i, buffer2[i]);
-//                NSLog(@"otherIndexDistance is: %ld", otherIndexDistance);
+                
+                // if the distance between the letters at any of the indexes
+                // does not match the distance at index 0, we know it cannot be
+                // the same message
                 if (zeroIndexDistance != otherIndexDistance) {
                     return NO;
                 }
             }
+            
+        // if both characters are not alphanumeric, don't bother checking distances
         } else {
             if (buffer1[i] != buffer2[i]) {
                 NSLog(@"characters at %ld index are not the same type of character.", i);
@@ -137,6 +178,9 @@
 
     }
     
+    // if it passes all tests return yes. that is, the distance between the
+    // letters from each message at each individual index is exactly the same
+    // from start to end.
     return YES;
     
 }
@@ -185,25 +229,56 @@ int main(int argc, const char * argv[]) {
         NSLog(@"encoded message2B:  %@", encodedMessage2B);
         
         NSLog(@"\n");
+        NSLog(@"\n");
+        NSLog(@"TESTING EASY METHOD");
+        
+        NSLog(@"\n");
         NSLog(@"Are encoded message1A and encoded message1B the same? %@",
-              [cc isSameMessage:encodedMessage1A asMessage:encodedMessage1B]
+              [cc easyIsSameMessage:encodedMessage1A asMessage:encodedMessage1B]
               ? @"Yes." : @"No.");
         
         NSLog(@"\n");
         NSLog(@"Are encoded message1B and encoded message2B the same? %@",
-              [cc isSameMessage:encodedMessage1B asMessage:encodedMessage2B]
+              [cc easyIsSameMessage:encodedMessage1B asMessage:encodedMessage2B]
               ? @"Yes." : @"No.");
         
         NSLog(@"\n");
         NSLog(@"Are encoded message2A and encoded message2B the same? %@",
-              [cc isSameMessage:encodedMessage2A asMessage:encodedMessage2B]
+              [cc easyIsSameMessage:encodedMessage2A asMessage:encodedMessage2B]
               ? @"Yes." : @"No.");
         
         NSLog(@"\n");
         NSLog(@"Are encoded name and encoded message4 the same? %@",
-              [cc isSameMessage:encodedNameA asMessage:encodedMessage2B]
+              [cc easyIsSameMessage:encodedNameA asMessage:encodedMessage2B]
               ? @"Yes." : @"No.");
         
+        
+        
+        NSLog(@"\n");
+        NSLog(@"\n");
+        NSLog(@"TESTING HARD METHOD");
+        
+        NSLog(@"\n");
+        NSLog(@"Are encoded message1A and encoded message1B the same? %@",
+              [cc hardIsSameMessage:encodedMessage1A asMessage:encodedMessage1B]
+              ? @"Yes." : @"No.");
+        
+        NSLog(@"\n");
+        NSLog(@"Are encoded message1B and encoded message2B the same? %@",
+              [cc hardIsSameMessage:encodedMessage1B asMessage:encodedMessage2B]
+              ? @"Yes." : @"No.");
+        
+        NSLog(@"\n");
+        NSLog(@"Are encoded message2A and encoded message2B the same? %@",
+              [cc hardIsSameMessage:encodedMessage2A asMessage:encodedMessage2B]
+              ? @"Yes." : @"No.");
+        
+        NSLog(@"\n");
+        NSLog(@"Are encoded name and encoded message4 the same? %@",
+              [cc hardIsSameMessage:encodedNameA asMessage:encodedMessage2B]
+              ? @"Yes." : @"No.");
+        
+
         NSString *message3 = @" dfs s sd fs   sdf s df s  sdfsdfsd!";
         NSInteger offset25 = 25;
         NSString *encodedMessage3A = [cc encode:message3 offset:offset25];
@@ -213,8 +288,9 @@ int main(int argc, const char * argv[]) {
         
         NSLog(@"\n");
         NSLog(@"Are encoded message1A and encoded message3A the same? %@",
-              [cc isSameMessage:encodedMessage1A asMessage:encodedMessage3A]
+              [cc hardIsSameMessage:encodedMessage1A asMessage:encodedMessage3A]
               ? @"Yes." : @"No.");
+
 
     }
 }
