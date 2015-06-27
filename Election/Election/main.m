@@ -222,6 +222,24 @@ int main(int argc, const char * argv[]) {
         Contender *jeb = [[Contender alloc] initWithName:@"Jeb Bush"];
         Contender *chris = [[Contender alloc] initWithName:@"Chris Christie"];
         
+        Election *president = [[Election alloc] initWithElectionName:@"President"];
+        [president addContender:bernie];
+        [president addContender:hillary];
+        [president addContender:jeb];
+        [president addContender:chris];
+        NSLog(@"\n");
+        NSLog(@"Candidates for %@:", [president electionName]);
+        [president displayCandidates];
+        
+        Election *asshole = [[Election alloc] initWithElectionName:@"Asshole"];
+        [asshole addContender:ann];
+        [asshole addContender:donald];
+        NSLog(@"\n");
+        NSLog(@"Candidates for %@:", [asshole electionName]);
+        [asshole displayCandidates];
+        
+        
+        
     }
     return 0;
 }
