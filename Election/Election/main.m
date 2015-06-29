@@ -238,7 +238,7 @@
 
 @implementation ElectionSimulator {
     ElectionManager *_em;
-    NSInteger _vt;
+    
 }
 
 - (id)initWithElectionManager:(ElectionManager *)em {
@@ -306,6 +306,10 @@ int main(int argc, const char * argv[]) {
         [em displayResults];
         
         ElectionSimulator *es = [[ElectionSimulator alloc] initWithElectionManager:em];
+        
+//        ElectionSimulator *es = [[ElectionSimulator alloc] init];
+//        [es setElectionManager:em];
+        
         [es run];
         
         

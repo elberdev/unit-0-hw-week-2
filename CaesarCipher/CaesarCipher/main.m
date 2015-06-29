@@ -91,7 +91,7 @@
     // will run encode method using an offset that will return it to the original
     // EXAMPLE: offset 1 to encode becomes offset 25 to decode
     // EXAMPLE: offset 8 to encode becomes offset 18 to decode
-    // both encoder and decoder only need to knwow what the original offset
+    // both encoder and decoder only need to know what the original offset
     // was. The decode method will do the rest
     return [self encode:string offset: (_alphabetSize - offset)];
 }
