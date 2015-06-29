@@ -61,19 +61,11 @@
 }
 
 - (BOOL)checkSameCity:(Person *)person {
-    if ([[self city] isEqualToString:[person city]]) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return [[self city] isEqualToString:[person city]];
 }
 
 - (BOOL)checkSamePhoneNumber:(Person *)person {
-    if ([[self phoneNumber] isEqualToString:[person phoneNumber]]) {
-        return YES;
-    } else {
-        return NO;
-    }
+    return [[self phoneNumber] isEqualToString:[person phoneNumber]];
 }
 
 - (Person *)registerChild:(NSString *)name {
