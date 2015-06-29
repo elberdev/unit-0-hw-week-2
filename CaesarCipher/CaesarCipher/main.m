@@ -8,6 +8,8 @@
 
 #import <Foundation/Foundation.h>
 
+#define ALPHABET_SIZE 26
+
 @interface CaesarCipher : NSObject
 
 - (NSString *)decode:(NSString *)string offset:(NSInteger)offset;
@@ -18,23 +20,14 @@
 
 @end
 
-@implementation CaesarCipher {
-    NSInteger _alphabetSize;
-}
-
--(id)init {
-    if (self = [super init]) {
-        _alphabetSize = 26;
-    }
-    return self;
-}
+@implementation CaesarCipher
 
 - (NSString *)encode:(NSString *)string offset:(NSInteger)offset {
     
     // if offset is an illegal value, the assert statement will
     // fail and the app will crash with the provided error message
-    if (offset > _alphabetSize - 1) {
-        NSAssert(offset < _alphabetSize, @"offset is out of range. 1 - 25");
+    if (offset > ALPHABET_SIZE - 1) {
+        NSAssert(offset < ALPHABET_SIZE, @"offset is out of range. 1 - 25");
     }
     
     // unsigned can be positive only (like size_t)
@@ -73,7 +66,7 @@
         // modulo 26 ensures the values are only between 1 and 26
         // and adding low back gives us the correct unicode decimal of the new
         // char
-        result[i] = (buffer[i]%low + offset)%_alphabetSize + low;
+        result[i] = (buffer[i] % low + offset) % ALPHABET_SIZE + low;
         
 //        // DEBUG
 //        NSLog(@"buffer[%ld]:%u %% low:%ld + offset:%ld = %ld", i, buffer[i], low,
@@ -93,7 +86,7 @@
     // EXAMPLE: offset 8 to encode becomes offset 18 to decode
     // both encoder and decoder only need to know what the original offset
     // was. The decode method will do the rest
-    return [self encode:string offset: (_alphabetSize - offset)];
+    return [self encode:string offset: (ALPHABET_SIZE - offset)];
 }
 
 // THIS VERSION USES THE EXISTING ENCODING AND DECODING ALGORITHMS
@@ -101,7 +94,7 @@
     if ([msg1 length] != [msg2 length]) {
         return NO;
     } else {
-        for(int i = 1; i < _alphabetSize; i++) {
+        for(int i = 1; i < ALPHABET_SIZE; i++) {
             if ([msg1 isEqualToString: [self encode:msg2 offset:i]]) {
                 return YES;
             }
@@ -147,7 +140,7 @@
                 
                 // adjust for negative value
                 if (zeroIndexDistance < 0) {
-                    zeroIndexDistance += _alphabetSize;
+                    zeroIndexDistance += ALPHABET_SIZE;
                 }
             
             // get real distance between letters after index 0
@@ -156,7 +149,7 @@
                 
                 // adjust for negative value
                 if (otherIndexDistance < 0) {
-                    otherIndexDistance += _alphabetSize;
+                    otherIndexDistance += ALPHABET_SIZE;
                 }
                 
                 // if the distance between the letters at any of the indexes
